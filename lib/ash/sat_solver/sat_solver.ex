@@ -292,8 +292,18 @@ defmodule Ash.SatSolver do
     |> to_conjunctive_normal_form()
     |> lift_clauses()
     |> negations_to_negative_numbers()
-    |> Picosat.solve()
+    |> solve()
     |> solutions_to_predicate_values(bindings)
+  end
+
+  if Code.ensure_loaded?(Picosat) do
+    def solve(expression) do
+      Picosat.solve(expression)
+    end
+  else
+    def solve(expression) do
+      Ash.SatSolver.Csp.solve(expression)
+    end
   end
 
   defp solutions_to_predicate_values({:ok, solution}, bindings) do
